@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <title>Innlogging</title>
-    <!-- linker til CSS -->
     <link rel="stylesheet" href="loginn.css" />
   </head>
   <body>
@@ -11,41 +10,41 @@
       <h2>Innlogging</h2>
 
       <input type="text" id="fornavn" placeholder="Fornavn" />
-      <input type="text" id="etternavn" placeholder="Etternavn" />
+      <input type="password" id="passord" placeholder="Passord" />
 
-      <!-- Starter innlogging -->
       <button onclick="loggInn()">Logg inn</button>
 
-      <!-- Feilmelding vises her -->
       <p id="feilmelding"></p>
     </div>
 
     <script>
       function loggInn() {
-        // Henter navn og gjør dem til små bosktaver
-
+        // Henter verdier og gjør dem små (case-insensitive)
         const fornavn = document
           .getElementById("fornavn")
           .value.trim()
           .toLowerCase();
-        const etternavn = document
-          .getElementById("etternavn")
+
+        const passord = document
+          .getElementById("passord")
           .value.trim()
           .toLowerCase();
-        const fulltNavn = fornavn + " " + etternavn;
 
-        // Navn som har tilgang
-        const tillatteNavn = ["tore thiesen", "mikkil haddal", "lasse wiik"];
+        // Gyldige brukere
+        const brukere = {
+          tore: "akautv",
+          mikkil: "akautv",
+          lasse: "akautv",
+        };
 
-        // Sjekker om navnet er godkjent
-        if (tillatteNavn.includes(fulltNavn)) {
+        // Sjekk innlogging
+        if (brukere[fornavn] === passord) {
           window.location.href = "frontside.html";
         } else {
           document.getElementById("feilmelding").textContent =
-            "Du har ikke tilgang til denne siden";
+            "Feil fornavn eller passord";
         }
       }
-      // Innloggingssystemet er bare midlertidig og skal lage en mer sikker innlogging senere.
     </script>
   </body>
 </html>
