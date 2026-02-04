@@ -2,15 +2,20 @@
 <html lang="no">
   <head>
     <meta charset="utf-8" />
+    <!-- Gjør siden responsiv på mobil -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Supabase demo — Meldinger</title>
-    <!-- Laster Bootstrap for enkel styling -->
+
+    <!-- Bootstrap for enkel design og layout -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <!-- reCAPTCHA -->
+
+    <!-- Google reCAPTCHA mot spam/boter -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <!-- Litt egen CSS-styling -->
     <style>
       body {
         background: #f8fafc;
@@ -28,7 +33,9 @@
       }
     </style>
   </head>
+
   <body>
+    <!-- Toppmeny -->
     <nav class="navbar navbar-expand-md bg-white border-bottom">
       <div class="container">
         <a class="navbar-brand fw-semibold" href="#">Supabase demo</a>
@@ -36,47 +43,43 @@
     </nav>
 
     <main class="container my-4">
+      <!-- Overskrift og forklaring -->
       <header class="text-center mb-4">
         <h1 class="h4 fw-bold">Navn + kort melding</h1>
         <p class="text-muted mb-0">Skriver til databasen og viser under.</p>
       </header>
 
       <section class="row g-4">
+        <!-- Skjema for innsending -->
         <div class="col-12 col-lg-5">
           <div class="card card-elev shadow-sm">
             <div class="card-body">
               <h2 class="h6 mb-3">Send inn</h2>
+
+              <!-- Skjema med validering -->
               <form id="form" class="needs-validation" novalidate>
                 <div class="mb-3">
-                  <label class="form-label" for="name">Navn</label>
+                  <label class="form-label">Navn</label>
                   <input
                     id="name"
                     class="form-control"
                     minlength="2"
                     maxlength="30"
                     required
-                    placeholder="Navn"
                   />
-                  <div class="invalid-feedback">
-                    Skriv inn navnet ditt (2–30 tegn).
-                  </div>
                 </div>
 
                 <div class="mb-3">
-                  <label class="form-label" for="content">Kort melding</label>
+                  <label class="form-label">Kort melding</label>
                   <input
                     id="content"
                     class="form-control"
                     maxlength="140"
                     required
-                    placeholder="Melding (maks 140 tegn)"
                   />
-                  <div class="invalid-feedback">
-                    Skriv en kort melding (maks 140 tegn).
-                  </div>
                 </div>
 
-                <!-- reCAPTCHA -->
+                <!-- CAPTCHA for å stoppe roboter -->
                 <div class="mb-3">
                   <div
                     class="g-recaptcha"
@@ -94,23 +97,22 @@
                 <button class="btn btn-primary w-100" type="submit">
                   Lagre
                 </button>
+
+                <!-- Statusmelding -->
                 <div id="status" class="form-text mt-2 muted">Klar</div>
               </form>
             </div>
           </div>
         </div>
 
+        <!-- Viser lagrede meldinger -->
         <div class="col-12 col-lg-7">
           <div class="card card-elev shadow-sm">
             <div class="card-body">
-              <div
-                class="d-flex align-items-center justify-content-between mb-2"
+              <h2 class="h6 mb-2">Meldinger</h2>
+              <span class="badge text-bg-light"
+                ><span id="count">0</span> stk</span
               >
-                <h2 class="h6 mb-0">Meldinger</h2>
-                <span class="badge text-bg-light"
-                  ><span id="count">0</span> stk</span
-                >
-              </div>
               <div id="msgs" class="d-grid gap-2"></div>
             </div>
           </div>
@@ -118,16 +120,19 @@
       </section>
     </main>
 
+    <!-- Supabase bibliotek -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
-      const SUPABASE_URL = "https://dchnufeiqeweidzxmbqa.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjaG51ZmVpcWV3ZWlkenhtYnFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDExOTMsImV4cCI6MjA3OTU3NzE5M30.jbflDov4w3nyF_PNwhxs_WKTZTPIhYZ344sKXvXTRdY";
+      // Kobler til Supabase-databasen
+      const SUPABASE_URL = "DIN_URL";
+      const SUPABASE_ANON_KEY = "DIN_KEY";
       const supabase = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_ANON_KEY
       );
 
+      // Henter elementer fra siden
       const form = document.getElementById("form");
       const nameInput = document.getElementById("name");
       const contentInput = document.getElementById("content");
@@ -135,6 +140,7 @@
       const statusEl = document.getElementById("status");
       const countEl = document.getElementById("count");
 
+      // Sikrer tekst mot HTML-injeksjon
       function esc(s) {
         return (s || "").replace(
           /[<>&"']/g,
@@ -149,6 +155,7 @@
         );
       }
 
+      // Deler opp navn og melding fra databasen
       function parseRow(r) {
         const raw = r.content || "";
         const i = raw.indexOf("::");
@@ -161,67 +168,51 @@
             };
       }
 
+      // Henter og viser meldinger
       async function loadMessages() {
         statusEl.textContent = "Laster...";
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from("messages")
           .select("*")
           .order("created_at", { ascending: false })
           .limit(100);
-        if (error) {
-          statusEl.textContent = "Feil: " + error.message;
-          return;
-        }
+
         countEl.textContent = (data || []).length;
+
         msgsEl.innerHTML = (data || [])
           .map((r) => {
             const it = parseRow(r);
-            return `<div class="message"><strong>${esc(
-              it.name
-            )}</strong>: ${esc(it.message)}<div class="time">${new Date(
-              it.created_at
-            ).toLocaleString()}</div></div>`;
+            return `<div><strong>${esc(it.name)}</strong>: ${esc(
+              it.message
+            )}</div>`;
           })
           .join("");
+
         statusEl.textContent = "Klar";
       }
 
+      // Når skjema sendes inn
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        form.classList.add("was-validated");
-        if (!form.checkValidity()) return;
 
-        // CAPTCHA sjekk
-        const captcha = grecaptcha.getResponse();
-        if (!captcha) {
+        // CAPTCHA-sjekk
+        if (!grecaptcha.getResponse()) {
           document.getElementById("captcha-error").style.display = "block";
           return;
         }
-        document.getElementById("captcha-error").style.display = "none";
 
         const name = nameInput.value.trim();
         const msg = contentInput.value.trim();
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        statusEl.textContent = "Lagrer...";
 
-        const { error } = await supabase
-          .from("messages")
-          .insert({ content: name + "::" + msg });
-        submitBtn.disabled = false;
-        if (error) {
-          statusEl.textContent = "Feil ved lagring: " + error.message;
-          return;
-        }
+        // Lagrer til databasen
+        await supabase.from("messages").insert({ content: name + "::" + msg });
 
         form.reset();
-        form.classList.remove("was-validated");
         grecaptcha.reset();
-        statusEl.textContent = "Lagret!";
-        nameInput.focus();
         loadMessages();
       });
 
+      // Laster meldinger ved start
       loadMessages();
     </script>
   </body>

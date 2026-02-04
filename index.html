@@ -1,25 +1,33 @@
 <!DOCTYPE html>
+<!-- HTML5-dokument -->
 <html lang="no">
   <head>
     <meta charset="UTF-8" />
     <title>Innlogging</title>
+
+    <!-- Kobler til CSS for design -->
     <link rel="stylesheet" href="loginn.css" />
   </head>
+
   <body>
+    <!-- Innloggingsboks -->
     <div class="login-container">
       <h2>Innlogging</h2>
 
+      <!-- Inputfelt for navn og passord -->
       <input type="text" id="fornavn" placeholder="Fornavn" />
       <input type="password" id="passord" placeholder="Passord" />
 
+      <!-- Knapp som starter innlogging -->
       <button onclick="loggInn()">Logg inn</button>
 
+      <!-- Viser feilmelding ved feil -->
       <p id="feilmelding"></p>
     </div>
 
     <script>
       function loggInn() {
-        // Henter verdier og gjør dem små (case-insensitive)
+        // Henter tekst fra inputfeltene og gjør dem små bokstaver
         const fornavn = document
           .getElementById("fornavn")
           .value.trim()
@@ -30,19 +38,19 @@
           .value.trim()
           .toLowerCase();
 
-        // Gyldige brukere
+        // Liste over gyldige brukere
         const brukere = {
           tore: "akautv",
           mikkil: "akautv",
           lasse: "akautv",
         };
 
-        // Sjekk innlogging
+        // Sjekker om brukernavn og passord stemmer
         if (brukere[fornavn] === passord) {
-          window.location.href = "frontside.html";
+          window.location.href = "frontside.html"; // sender videre
         } else {
           document.getElementById("feilmelding").textContent =
-            "Feil fornavn eller passord";
+            "Feil fornavn eller passord"; // viser feil
         }
       }
     </script>

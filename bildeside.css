@@ -1,27 +1,27 @@
-/* Bakgrunn som inspirasjonsbildet */
+/* Bakgrunn på hele siden */
 body {
   background: #f2f2f2;
   height: 100vh;
 }
 
-/* Kort-stil */
+/* Stil på kortet/boksen rundt bildene */
 .card {
   border: 0;
   border-radius: 10px;
 }
 
-/* Flexbox grid */
+/* Flexbox-oppsett for bildene */
 .bilder {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: wrap; /* gjør at bilder går til ny rad */
+  gap: 10px; /* mellomrom mellom bilder */
   width: 300px;
 }
 
-/* 1:1 bilder */
+/* Gjør bildene kvadratiske og tilpasset boksen */
 .bilder img {
-  width: calc(50% - 5px);
+  width: calc(50% - 5px); /* 2 bilder per rad */
   aspect-ratio: 1/1;
-  object-fit: cover;
+  object-fit: cover; /* beskjærer pent */
   border-radius: 5px;
 }
